@@ -1,0 +1,19 @@
+{
+  "n_files": 21367,
+  "mean_of_means": 0.11973324178741061,
+  "mean_of_stds": 0.1140668888256808,
+  "params": {
+    "pixels_per_cell": [
+      8,
+      8
+    ],
+    "cells_per_block": [
+      2,
+      2
+    ],
+    "resize_to": [
+      128,
+      128
+    ]
+  }
+}
