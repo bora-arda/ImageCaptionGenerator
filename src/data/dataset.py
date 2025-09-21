@@ -1,0 +1,2 @@
+class ImageCaptionDataset(Dataset):
+    pass
