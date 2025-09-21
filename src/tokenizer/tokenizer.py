@@ -88,12 +88,12 @@ class BPETokenizer:
         
         return token_ids[:max_len]
     
-    def get_input_and_target(self, token_ids: list[int]) -> tuple:
+    def get_input_and_target(self, token_ids: list[int], max_len: int = 180) -> tuple:
         """Get input and target token IDs with padding values"""
         if self.sp is None:
             raise ValueError("Tokenizer not loaded")
         
-        input_ids = self.pad([self.sp.bos_id()] + token_ids)
-        target_ids = self.pad(token_ids + [self.sp.eos_id()])
+        input_ids = self.pad([self.sp.bos_id()] + token_ids, max_len)
+        target_ids = self.pad(token_ids + [self.sp.eos_id()], max_len)
         
         return input_ids, target_ids
