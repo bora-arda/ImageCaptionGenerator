@@ -6,5 +6,6 @@ from torch.utils.data import Dataset
 
 
 class ImageCaptionDataset(Dataset):
+    """Dataset Class for Image-Caption Pairs"""
     def __init__(self, captions: str, image_dir: str, ):
         pass

@@ -3,11 +3,13 @@ import sentencepiece as spm
 
 class BPETokenizer:
     def __init__(self, model_path: str=None):
+        
         self.sp = None
         self.model_path = model_path
 
     def train(self, input_file: str, model_prefix: str="caption_bpe", vocab_size: int=6000):
         """Train tokenizer"""
+        
         options = dict(
             # Input Specs:
             input=input_file,
@@ -43,12 +45,14 @@ class BPETokenizer:
             # Systems
             num_threads=os.cpu_count(),
         )
+        
         spm.SentencePieceTrainer.train(**options)
         self.model_path = f"{model_prefix}.model"
         self.load_tokenizer()
 
     def load_tokenizer(self):
         """Load the tokenizer"""
+        
         if self.model_path and os.path.exists(self.model_path):
             self.sp = spm.SentencePieceProcessor()
             self.sp.load(self.model_path)
@@ -57,6 +61,7 @@ class BPETokenizer:
 
     def encode(self, text: str) -> list[int]:
         """Encode text to token IDs"""
+        
         if self.sp is None:
             raise ValueError("Tokenizer not loaded")
         return self.sp.EncodeAsIds(text)
@@ -64,6 +69,7 @@ class BPETokenizer:
 
     def decode(self, token_ids: list[int]) -> int:
         """Decode token IDs"""
+        
         if self.sp is None:
             raise ValueError("Tokenizer not loaded")
         return self.sp.DecodeIds(token_ids)
@@ -78,6 +84,7 @@ class BPETokenizer:
 
     def pad(self, token_ids: list[int], max_len: int = 25) -> list[int]:
         """Get token IDs with padding values"""
+        
         if self.sp is None:
             raise ValueError("Tokenizer not loaded")
         
@@ -88,12 +95,12 @@ class BPETokenizer:
         
         return token_ids[:max_len]
     
-    def get_input_and_target(self, token_ids: list[int], max_len: int = 180) -> tuple:
+    def get_with_bos_eos(self, token_ids: list[int]) -> list[int]:
         """Get input and target token IDs with padding values"""
+        
         if self.sp is None:
             raise ValueError("Tokenizer not loaded")
         
-        input_ids = self.pad([self.sp.bos_id()] + token_ids, max_len)
-        target_ids = self.pad(token_ids + [self.sp.eos_id()], max_len)
+        new_tokens = self.pad([self.sp.bos_id()] + token_ids + [self.sp.eos_id()])
         
-        return input_ids, target_ids
+        return new_tokens
