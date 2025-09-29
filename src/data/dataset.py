@@ -29,14 +29,14 @@ class ImageCaptionDataset(Dataset):
             df = pd.read_csv(self.captions_dir)
             for _, row in df.iterrows():
                 data.append({
-                    'image_path': str(self.image_dir / (row['image_id'] + '.jpg')),
+                    'image_path': str(Path('../data/raw/train/train') / (str(row['image_id']) + '.jpg')),
                     'caption': str(row['caption'])
                 })
         elif self.captions_dir.endswith('.json'):
             df = pd.read_json(self.captions_dir)
             for _, row in df.iterrows():
                 data.append({
-                    'image_path': str(self.image_dir / (row['image_id'] + '.jpg')),
+                    'image_path': str(Path('../data/raw/train/train') / (str(row['image_id']) + '.jpg')),
                     'caption': str(row['caption'])
                 })
                 
