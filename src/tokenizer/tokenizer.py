@@ -2,8 +2,9 @@ import os
 import sentencepiece as spm
 
 class BPETokenizer:
+    """Handle caption toknization using SentencePiece"""
+    
     def __init__(self, model_path: str=None):
-        
         self.sp = None
         self.model_path = model_path
 
@@ -82,7 +83,7 @@ class BPETokenizer:
         
         return self.sp.GetPieceSize()
 
-    def pad(self, token_ids: list[int], max_len: int = 25) -> list[int]:
+    def pad(self, token_ids: list[int], max_len: int = 250) -> list[int]:
         """Get token IDs with padding values"""
         
         if self.sp is None:
