@@ -3,6 +3,7 @@ import numpy as np
 from pathlib import Path
 import torch
 from torch.utils.data import Dataset
+from torch.nn.utils.rnn import pad_sequence
 from src.tokenizer.tokenizer import BPETokenizer
 from src.data.hog_extractor import ImageFeatureExtractor
 from tqdm import tqdm
@@ -56,5 +57,33 @@ class ImageCaptionDataset(Dataset):
         
         image_hog_features = self.feature_extractor.extract_hog_features(item['image_path'])
         
-        caption_tokens = self.tokenizer.encode(item['caption'])
-    
+        tokenized_caption = self.tokenizer.encode(item['caption'])
+        tokenized_caption = self.tokenizer.apply_bos_eos(tokenized_caption)
+        tokenized_caption = tokenized_caption[:self.max_caption_length-1] + [self.tokenizer.sp.eos_id()]
+        
+        return {
+            'image_features': image_hog_features,
+            'tokenized_caption': tokenized_caption,
+            'caption_length': len(tokenized_caption),
+            'original_caption': item['caption']
+        }
+        
+    def collate_fn(self, batch: list[dict]) -> dict:
+        """Custom collate function for DataLoader"""
+        
+        image_features = [item['image_features'] for item in batch]
+        tokenized_captions = [item['tokenized_caption'] for item in batch]
+        caption_lengths = [item['caption_length'] for item in batch]
+        original_captions = [item['original_caption'] for item in batch]
+        
+        image_features = torch.stack(image_features)
+        
+        tokenized_captions = pad_sequence(tokenized_captions, batch_first=True, padding_value=self.tokenizer.sp.pad_id())
+        
+        return {
+        'image_features': image_features,
+        'tokenized_captions': tokenized_captions,
+        'caption_lengths': torch.tensor(caption_lengths, dtype=torch.long),
+        'original_captions': original_captions
+        }
+        

@@ -82,26 +82,23 @@ class BPETokenizer:
             raise ValueError("Tokenizer not loaded")
         
         return self.sp.GetPieceSize()
-
-    def pad(self, token_ids: list[int], max_len: int = 250) -> list[int]:
-        """Get token IDs with padding values"""
-        
-        if self.sp is None:
-            raise ValueError("Tokenizer not loaded")
-        
-        pad_id = self.sp.pad_id()
-        
-        if len(token_ids) < max_len:
-            return token_ids + [pad_id] * (max_len - len(token_ids))
-        
-        return token_ids[:max_len]
     
-    def get_with_bos_eos(self, token_ids: list[int]) -> list[int]:
-        """Get input and target token IDs with padding values"""
+    def apply_bos_eos(self, token_ids: list[int]) -> list[int]:
+        """Apply <BOS> and <EOS> tokens"""
         
         if self.sp is None:
             raise ValueError("Tokenizer not loaded")
         
-        new_tokens = self.pad([self.sp.bos_id()] + token_ids + [self.sp.eos_id()])
+        new_tokens = [self.sp.bos_id()] + token_ids + [self.sp.eos_id()]
         
         return new_tokens
+    
+    def get_special_tokens(self) -> dict[str, int]:
+        """Get special token ids"""
+        
+        return {
+            'bos': self.sp.bos_id(),
+            'eos': self.sp.eos_id(),
+            'pad': self.sp.pad_id(),
+            'unk': self.sp.unk_id()
+        }
